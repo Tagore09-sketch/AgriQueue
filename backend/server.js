@@ -25,6 +25,10 @@ app.use("/api/queue", queueRoutes);
 app.use("/api/procurement", procurementRoutes);
 app.use("/api/payments", paymentRoutes);
 
+app.get("/", (req, res) => {
+  res.json({ success: true, message: "🌾 AgriQueue Backend API Server is Live & Running!", timestamp: new Date() });
+});
+
 app.get("/api/health", (req, res) => {
   res.json({ success: true, message: "AgriQueue Backend API Running", timestamp: new Date() });
 });
