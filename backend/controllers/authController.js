@@ -206,7 +206,13 @@ exports.getMe = async (req, res) => {
   try {
     const db = getDb();
     const users = db.collection("users");
-    const user = await users.findOne({ _id: req.user.userId });
+    let user = await users.findOne({ _id: req.user.userId });
+    if (!user) {
+      const { ObjectId } = require("mongodb");
+      if (ObjectId.isValid(req.user.userId)) {
+        user = await users.findOne({ _id: new ObjectId(req.user.userId) });
+      }
+    }
 
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });

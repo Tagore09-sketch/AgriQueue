@@ -1,7 +1,17 @@
 // HTTP Client Utility implemented using XMLHttpRequest (XHR)
 // Complies strictly with restriction: NO Axios and NO native fetch()
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://agriqueue-ratz.onrender.com/api';
+const getBaseUrl = () => {
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL;
+  }
+  if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+    return 'http://localhost:5000/api';
+  }
+  return 'https://agriqueue-2-8eje.onrender.com/api';
+};
+
+const BASE_URL = getBaseUrl();
 
 /**
  * Custom XHR HTTP Request Helper

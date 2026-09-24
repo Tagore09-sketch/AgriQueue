@@ -59,12 +59,22 @@ class MemoryCollection {
   }
 
   _match(doc, query) {
+    if (query.$or && Array.isArray(query.$or)) {
+      return query.$or.some(subQuery => this._match(doc, subQuery));
+    }
     return Object.keys(query).every(key => {
-      if (typeof query[key] === 'object' && query[key] !== null) {
-        if (query[key].$in) return query[key].$in.includes(doc[key]);
-        if (query[key].$ne) return doc[key] !== query[key].$ne;
+      const docVal = doc[key];
+      const queryVal = query[key];
+
+      if (typeof queryVal === 'object' && queryVal !== null && !Array.isArray(queryVal)) {
+        if (queryVal.$in) return queryVal.$in.map(String).includes(String(docVal));
+        if (queryVal.$ne) return String(docVal) !== String(queryVal.$ne);
+        if (queryVal.$lt) return docVal < queryVal.$lt;
+        if (queryVal.$gt) return docVal > queryVal.$gt;
+        if (queryVal.$lte) return docVal <= queryVal.$lte;
+        if (queryVal.$gte) return docVal >= queryVal.$gte;
       }
-      return String(doc[key]) === String(query[key]);
+      return String(docVal) === String(queryVal);
     });
   }
 }
