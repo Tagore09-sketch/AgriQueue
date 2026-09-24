@@ -7,7 +7,8 @@ export default function OfficerLogin() {
   const navigate = useNavigate();
 
   const [mobile, setMobile] = useState('9000000000');
-  const [otp, setOtp] = useState('123456');
+  const [otp, setOtp] = useState('');
+  const [generatedOtp, setGeneratedOtp] = useState('');
   const [step, setStep] = useState(1); // 1 = Enter Mobile, 2 = Enter OTP
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -25,6 +26,8 @@ export default function OfficerLogin() {
       setLoading(true);
       const res = await api.post('/auth/send-otp', { mobile });
       if (res.success) {
+        setGeneratedOtp(res.otp || '123456');
+        setOtp(res.otp || '123456'); // Pre-fill with generated OTP for fast testing
         setStep(2);
       }
     } catch (err) {
@@ -38,8 +41,8 @@ export default function OfficerLogin() {
     e.preventDefault();
     setError('');
 
-    if (!otp) {
-      setError('Please enter the 6-digit OTP.');
+    if (!otp || otp.length !== 6) {
+      setError('Please enter a valid 6-digit OTP.');
       return;
     }
 
@@ -78,14 +81,18 @@ export default function OfficerLogin() {
           <p className="text-sm text-gray-500 mt-1">Authorized APMC Mandi Staff Login</p>
         </div>
 
-        {/* Credentials Banner */}
-        <div className="mb-6 bg-gray-900 text-white p-4 rounded-xl text-xs space-y-1 shadow-md">
-          <div className="font-bold text-agri-400 text-xs uppercase tracking-wider">Demo Officer Credentials:</div>
-          <div className="flex justify-between font-mono">
-            <span>Mobile: <strong>9000000000</strong></span>
-            <span>OTP: <strong>123456</strong></span>
+        {/* Dynamic OTP Notification Banner on Step 2 */}
+        {step === 2 && generatedOtp && (
+          <div className="mb-6 bg-agri-50 border border-agri-200 text-agri-900 p-4 rounded-xl text-sm flex items-center justify-between shadow-sm">
+            <div className="flex items-center gap-2 font-medium">
+              <ShieldCheck className="w-5 h-5 text-agri-700 flex-shrink-0" />
+              <span>Officer OTP:</span>
+            </div>
+            <div className="bg-agri-700 text-white font-mono font-bold text-base px-3 py-1 rounded-md">
+              {generatedOtp}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Card */}
         <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-md">
@@ -137,7 +144,7 @@ export default function OfficerLogin() {
             <form onSubmit={handleVerifyOtp} className="space-y-6">
               <div>
                 <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2 text-center">
-                  Enter Officer OTP
+                  Enter 6-Digit Officer OTP
                 </label>
                 <div className="relative">
                   <input
@@ -150,6 +157,9 @@ export default function OfficerLogin() {
                     className="block w-full py-3 px-4 bg-gray-50 border border-gray-300 rounded-xl text-center font-mono font-bold text-2xl tracking-widest text-gray-900 focus:bg-white focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-all"
                   />
                 </div>
+                <p className="text-[11px] text-gray-500 text-center mt-2">
+                  Enter the 6-digit OTP displayed above or type your 6-digit OTP.
+                </p>
               </div>
 
               <button
