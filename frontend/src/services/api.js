@@ -1,7 +1,7 @@
 // HTTP Client Utility implemented using XMLHttpRequest (XHR)
 // Complies strictly with restriction: NO Axios and NO native fetch()
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://agriqueue-ratz.onrender.com/api';
 
 /**
  * Custom XHR HTTP Request Helper
