@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { api } from '../services/api';
-import { User, Phone, ShieldCheck, MapPin, Sprout, Building2, CreditCard, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { User, Phone, ShieldCheck, MapPin, Sprout, Building2, CreditCard, AlertCircle, CheckCircle2, Scale } from 'lucide-react';
+import { kgToQtl, qtlToKg } from '../utils/quantity';
 
 export default function FarmerRegister() {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ export default function FarmerRegister() {
     district: '',
     cropName: 'Paddy',
     landArea: '',
+    expectedQuantityQtl: '',
     expectedQuantity: '',
     bankName: 'State Bank of India',
     accountNumber: '',
@@ -25,6 +27,28 @@ export default function FarmerRegister() {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setError('');
+  };
+
+  const handleQtlChange = (e) => {
+    const qtlVal = e.target.value;
+    const computedKg = qtlToKg(qtlVal);
+    setFormData(prev => ({
+      ...prev,
+      expectedQuantityQtl: qtlVal,
+      expectedQuantity: String(computedKg)
+    }));
+    setError('');
+  };
+
+  const handleKgChange = (e) => {
+    const kgVal = e.target.value;
+    const computedQtl = kgToQtl(kgVal);
+    setFormData(prev => ({
+      ...prev,
+      expectedQuantity: kgVal,
+      expectedQuantityQtl: computedQtl
+    }));
     setError('');
   };
 
@@ -54,7 +78,7 @@ export default function FarmerRegister() {
 
     // Expected Quantity validation
     if (parseFloat(formData.expectedQuantity) <= 0) {
-      setError('Expected quantity must be a positive number.');
+      setError('Expected quantity must be a positive number in Quintals or Kg.');
       return;
     }
 
@@ -69,7 +93,7 @@ export default function FarmerRegister() {
       if (res.success) {
         navigate('/farmer/login', { 
           state: { 
-            message: 'Registration successful! Please login with your mobile number.',
+            message: `Registration successful! Welcome SMS dispatched to +91 ${formData.mobile}. Please login.`,
             mobile: formData.mobile 
           } 
         });
@@ -82,20 +106,31 @@ export default function FarmerRegister() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gray-50 py-10 px-4 sm:px-6 lg:px-8 flex flex-col justify-center">
-      <div className="max-w-2xl mx-auto w-full">
+    <div className="min-h-[calc(100vh-4rem)] bg-gray-900 py-10 px-4 sm:px-6 lg:px-8 flex flex-col justify-center relative overflow-hidden">
+      
+      {/* Golden Wheat Harvest Background Image Overlay */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src="/farmer_register_bg.jpg"
+          alt="Harvest Field Background"
+          className="w-full h-full object-cover filter brightness-[0.35] blur-[1px]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/80 to-transparent" />
+      </div>
+
+      <div className="max-w-2xl mx-auto w-full relative z-10">
         
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex p-3 bg-agri-100 text-agri-700 rounded-2xl mb-3">
+          <div className="inline-flex p-3 bg-agri-500/20 text-agri-300 rounded-2xl mb-3 border border-agri-400/30 backdrop-blur-md">
             <Sprout className="w-8 h-8" />
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900">Farmer Registration</h2>
-          <p className="text-sm text-gray-500 mt-1">Register your profile and bank details for instant APMC procurement payments</p>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-white">Farmer Registration</h2>
+          <p className="text-sm text-gray-300 mt-1">Register your farmer profile and bank details for APMC procurement</p>
         </div>
 
-        {/* Card */}
-        <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-md">
+        {/* Form Card */}
+        <div className="bg-white/95 backdrop-blur-md p-6 sm:p-8 rounded-2xl border border-white/40 shadow-2xl">
           {error && (
             <div className="mb-6 bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-sm flex items-center gap-3">
               <AlertCircle className="w-5 h-5 flex-shrink-0" />
@@ -107,7 +142,7 @@ export default function FarmerRegister() {
             
             {/* Section 1: Personal Details */}
             <div>
-              <h3 className="text-sm font-extrabold text-gray-900 uppercase tracking-wider mb-3 pb-1 border-b border-gray-100 flex items-center gap-2">
+              <h3 className="text-sm font-extrabold text-gray-900 uppercase tracking-wider mb-3 pb-1 border-b border-gray-200 flex items-center gap-2">
                 <User className="w-4 h-4 text-agri-700" /> Personal & Contact Details
               </h3>
 
@@ -123,7 +158,7 @@ export default function FarmerRegister() {
                     onChange={handleChange}
                     placeholder="e.g. Ravi Kumar"
                     required
-                    className="block w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:bg-white focus:ring-2 focus:ring-agri-500 focus:border-agri-500 transition-all"
+                    className="block w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm font-semibold text-gray-900 focus:bg-white focus:ring-2 focus:ring-agri-500 focus:border-agri-500 transition-all"
                   />
                 </div>
 
@@ -140,7 +175,7 @@ export default function FarmerRegister() {
                       onChange={handleChange}
                       placeholder="9876543210"
                       required
-                      className="block w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:bg-white focus:ring-2 focus:ring-agri-500 focus:border-agri-500 transition-all"
+                      className="block w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm font-bold text-gray-900 focus:bg-white focus:ring-2 focus:ring-agri-500 focus:border-agri-500 transition-all"
                     />
                   </div>
 
@@ -156,7 +191,7 @@ export default function FarmerRegister() {
                       onChange={handleChange}
                       placeholder="123456789012"
                       required
-                      className="block w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:bg-white focus:ring-2 focus:ring-agri-500 focus:border-agri-500 transition-all"
+                      className="block w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm font-mono text-gray-900 focus:bg-white focus:ring-2 focus:ring-agri-500 focus:border-agri-500 transition-all"
                     />
                   </div>
                 </div>
@@ -195,27 +230,32 @@ export default function FarmerRegister() {
               </div>
             </div>
 
-            {/* Section 2: Crop Details */}
+            {/* Section 2: Crop & Quantity in Quintals */}
             <div>
-              <h3 className="text-sm font-extrabold text-gray-900 uppercase tracking-wider mb-3 pb-1 border-b border-gray-100 flex items-center gap-2">
+              <h3 className="text-sm font-extrabold text-gray-900 uppercase tracking-wider mb-3 pb-1 border-b border-gray-200 flex items-center gap-2">
                 <Sprout className="w-4 h-4 text-agri-700" /> Crop & Land Details
               </h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
-                    Crop Name *
-                  </label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">
+                      Crop Type
+                    </label>
+                    <span className="text-[10px] font-bold px-1 bg-gray-200 text-gray-600 rounded">Optional</span>
+                  </div>
                   <select
                     name="cropName"
                     value={formData.cropName}
                     onChange={handleChange}
-                    className="block w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:bg-white focus:ring-2 focus:ring-agri-500 focus:border-agri-500 transition-all"
+                    className="block w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm font-semibold text-gray-900 focus:bg-white focus:ring-2 focus:ring-agri-500 focus:border-agri-500 transition-all"
                   >
                     <option value="Paddy">Paddy</option>
+                    <option value="Wheat">Wheat</option>
                     <option value="Maize">Maize</option>
                     <option value="Cotton">Cotton</option>
-                    <option value="Wheat">Wheat</option>
+                    <option value="Pulses">Pulses</option>
+                    <option value="General Produce / Paddy">General Produce / Not Specified</option>
                   </select>
                 </div>
 
@@ -231,31 +271,35 @@ export default function FarmerRegister() {
                     onChange={handleChange}
                     placeholder="e.g. 3.5"
                     required
-                    className="block w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:bg-white focus:ring-2 focus:ring-agri-500 focus:border-agri-500 transition-all"
+                    className="block w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm font-semibold text-gray-900 focus:bg-white focus:ring-2 focus:ring-agri-500 focus:border-agri-500 transition-all"
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
-                    Expected Qty (Kg) *
+                    Expected Qty (Quintals) *
                   </label>
-                  <input
-                    type="number"
-                    name="expectedQuantity"
-                    value={formData.expectedQuantity}
-                    onChange={handleChange}
-                    placeholder="e.g. 2500"
-                    required
-                    className="block w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:bg-white focus:ring-2 focus:ring-agri-500 focus:border-agri-500 transition-all"
-                  />
+                  <div className="relative">
+                    <input
+                      type="number"
+                      step="0.5"
+                      name="expectedQuantityQtl"
+                      value={formData.expectedQuantityQtl}
+                      onChange={handleQtlChange}
+                      placeholder="e.g. 25"
+                      required
+                      className="block w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm font-bold text-gray-900 focus:bg-white focus:ring-2 focus:ring-agri-500 focus:border-agri-500 transition-all"
+                    />
+                    <span className="absolute right-2.5 top-2.5 text-[10px] font-bold text-agri-700 bg-agri-100 px-1.5 py-0.5 rounded">Qtl</span>
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Section 3: Bank Details */}
             <div>
-              <h3 className="text-sm font-extrabold text-gray-900 uppercase tracking-wider mb-3 pb-1 border-b border-gray-100 flex items-center gap-2">
-                <Building2 className="w-4 h-4 text-agri-700" /> Bank Account Details (For Payment Disbursal)
+              <h3 className="text-sm font-extrabold text-gray-900 uppercase tracking-wider mb-3 pb-1 border-b border-gray-200 flex items-center gap-2">
+                <Building2 className="w-4 h-4 text-agri-700" /> Bank Account Details (For 24h Payment Disbursal)
               </h3>
 
               <div className="space-y-4">
@@ -271,7 +315,7 @@ export default function FarmerRegister() {
                       onChange={handleChange}
                       placeholder="State Bank of India"
                       required
-                      className="block w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:bg-white focus:ring-2 focus:ring-agri-500 focus:border-agri-500 transition-all"
+                      className="block w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm font-semibold text-gray-900 focus:bg-white focus:ring-2 focus:ring-agri-500 focus:border-agri-500 transition-all"
                     />
                   </div>
 
@@ -286,7 +330,7 @@ export default function FarmerRegister() {
                       onChange={handleChange}
                       placeholder="98765432101234"
                       required
-                      className="block w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:bg-white focus:ring-2 focus:ring-agri-500 focus:border-agri-500 transition-all"
+                      className="block w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm font-mono text-gray-900 focus:bg-white focus:ring-2 focus:ring-agri-500 focus:border-agri-500 transition-all"
                     />
                   </div>
                 </div>
@@ -328,7 +372,7 @@ export default function FarmerRegister() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-2 bg-agri-700 hover:bg-agri-800 text-white font-bold py-3.5 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
+              className="w-full mt-2 bg-agri-700 hover:bg-agri-800 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2"
             >
               {loading ? (
                 <span>Registering Profile...</span>
