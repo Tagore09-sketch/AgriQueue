@@ -24,22 +24,6 @@ export default function Home() {
           {/* Hero Content Container with High-Contrast Glassmorphism */}
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
             
-            {/* Highlighted Glowing Brand Title Header */}
-            <div className="inline-flex items-center justify-center gap-3 bg-gray-950/90 backdrop-blur-xl border-2 border-amber-400/80 px-6 py-3 rounded-3xl shadow-2xl mb-6 ring-4 ring-amber-400/20">
-              <img
-                src="/farmer_logo.png"
-                alt="AgriQueue Farmer Emblem"
-                className="w-12 h-12 sm:w-14 sm:h-14 object-contain rounded-xl p-0.5 bg-gray-900 border border-amber-400 shadow-lg"
-              />
-              <div className="text-left">
-                <span className="text-2xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-200 to-agri-400 tracking-tight block">
-                  AgriQueue
-                </span>
-                <span className="text-[11px] sm:text-xs font-black tracking-widest text-agri-300 uppercase block">
-                  Smart APMC Procurement & Queue System
-                </span>
-              </div>
-            </div>
 
 
             {/* Hero Main Heading */}
