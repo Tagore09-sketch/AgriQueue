@@ -1,12 +1,32 @@
 services:
+  # Backend Node.js API Web Service
   - type: web
     name: agriqueue-backend
     env: node
     plan: free
-    buildCommand: cd backend && npm install
-    startCommand: cd backend && npm start
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
     envVars:
       - key: PORT
         value: 5000
       - key: JWT_SECRET
         value: agriqueue_super_secret_jwt_key_2026
+      - key: MONGO_URI
+        value: mongodb+srv://nikhiljalli15_db_user:9LKeVnLGHHWCr0sC@cluster0.mongodb.net/agriqueue?retryWrites=true&w=majority
+
+  # Frontend React SPA Static Site
+  - type: web
+    name: agriqueue-frontend
+    env: static
+    plan: free
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://agriqueue-3-qnqd.onrender.com/api
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
