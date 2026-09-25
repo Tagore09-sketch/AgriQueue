@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, Clock, ClipboardCheck, CreditCard, ArrowRight, CheckCircle, Sprout } from 'lucide-react';
+import { Calendar, Clock, ClipboardCheck, CreditCard, ArrowRight, CheckCircle } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -41,13 +41,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Tagline Badge */}
-            <div className="flex items-center justify-center">
-              <div className="inline-flex items-center gap-2 bg-agri-950/80 backdrop-blur-md border border-agri-400/50 text-agri-300 text-xs sm:text-sm font-bold px-4 py-1.5 rounded-full mb-6 shadow-2xl">
-                <Sprout className="w-4 h-4 text-agri-400" />
-                <span>Book. Queue. Procure. Get Paid.</span>
-              </div>
-            </div>
 
             {/* Hero Main Heading */}
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight mb-6 drop-shadow-lg">
