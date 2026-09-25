@@ -24,15 +24,19 @@ export default function Home() {
           {/* Hero Content Container with High-Contrast Glassmorphism */}
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
             
+            {/* 1. Brand Tag */}
+            <div className="inline-flex items-center gap-2 bg-agri-950/90 backdrop-blur-md border border-agri-400/60 text-agri-300 text-sm sm:text-base font-extrabold px-5 py-2 rounded-full mb-6 shadow-xl ring-2 ring-agri-500/30">
+              <img src="/farmer_logo.png" alt="AgriQueue Logo" className="w-6 h-6 object-contain rounded-md p-0.5 bg-gray-900 border border-agri-400" />
+              <span>AgriQueue - Smart APMC Procurement System</span>
+            </div>
 
-
-            {/* Hero Main Heading */}
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight mb-6 drop-shadow-lg">
+            {/* 2. Main Heading */}
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight mb-6 drop-shadow-lg max-w-4xl mx-auto">
               Avoid Long Waiting at <span className="text-transparent bg-clip-text bg-gradient-to-r from-agri-400 via-emerald-300 to-green-400">APMC Procurement Centres</span>
             </h1>
 
-            {/* Description */}
-            <p className="text-base sm:text-xl text-white mb-8 max-w-3xl mx-auto font-bold leading-relaxed drop-shadow-md bg-black/40 backdrop-blur-md p-4 rounded-2xl border border-white/20">
+            {/* 3. Description */}
+            <p className="text-base sm:text-lg text-gray-100 mb-8 max-w-3xl mx-auto font-medium leading-relaxed drop-shadow-md bg-black/50 backdrop-blur-md p-5 rounded-2xl border border-white/15">
               AgriQueue empowers farmers to book procurement slots in advance, track live queue positions, view digital inspection records, and track real-time bank payment disbursals.
             </p>
 
