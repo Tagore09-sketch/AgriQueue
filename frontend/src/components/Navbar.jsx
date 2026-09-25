@@ -24,15 +24,17 @@ export default function Navbar() {
         <div className="flex justify-between h-16 items-center">
           
           {/* Logo & Application Name */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="bg-agri-700 text-white p-2 rounded-xl shadow-md group-hover:bg-agri-800 transition-colors">
-              <Sprout className="w-6 h-6" />
-            </div>
+          <Link to="/" className="flex items-center gap-2.5 group">
+            <img
+              src="/farmer_logo.png"
+              alt="AgriQueue Farmer Logo"
+              className="w-9 h-9 object-contain rounded-lg shadow-sm border border-agri-200 p-0.5 bg-gray-900 group-hover:scale-105 transition-transform"
+            />
             <div>
-              <span className="text-xl font-extrabold text-gray-900 tracking-tight">
+              <span className="text-xl font-black text-gray-900 tracking-tight">
                 Agri<span className="text-agri-700">Queue</span>
               </span>
-              <span className="hidden sm:inline-block ml-2 text-xs font-semibold text-agri-700 bg-agri-50 px-2 py-0.5 rounded-full border border-agri-200">
+              <span className="hidden sm:inline-block ml-2 text-[11px] font-bold text-agri-800 bg-agri-50 px-2 py-0.5 rounded-full border border-agri-200">
                 APMC Smart System
               </span>
             </div>
