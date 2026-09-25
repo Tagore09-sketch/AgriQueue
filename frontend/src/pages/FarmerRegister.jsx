@@ -106,10 +106,10 @@ export default function FarmerRegister() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-emerald-950 via-gray-900 to-amber-950 py-10 px-4 sm:px-6 lg:px-8 flex items-center justify-center relative overflow-hidden">
+    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-emerald-950 via-gray-900 to-amber-950 py-8 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center relative overflow-hidden">
       
       {/* Background Image Ambient Overlay */}
-      <div className="absolute inset-0 z-0 opacity-30 mix-blend-overlay">
+      <div className="absolute inset-0 z-0 opacity-25 mix-blend-overlay">
         <img
           src="/farmer_register_bg.jpg"
           alt="Harvest Field Background"
@@ -117,23 +117,23 @@ export default function FarmerRegister() {
         />
       </div>
 
-      <div className="max-w-7xl mx-auto w-full relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+      <div className="max-w-7xl mx-auto w-full relative z-10">
         
-        {/* LEFT SIDE: Farmer Registration Form */}
-        <div className="lg:col-span-7 flex flex-col justify-center">
-          
-          {/* Header */}
-          <div className="mb-6">
-            <div className="inline-flex items-center gap-2 bg-amber-400/20 text-amber-300 px-3.5 py-1.5 rounded-full text-xs font-bold border border-amber-400/30 mb-3">
-              <Sprout className="w-4 h-4 text-amber-400" />
-              <span>Official APMC Farmer Registration Portal</span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">Farmer Registration</h2>
-            <p className="text-sm text-emerald-200/90 mt-1">Register your profile and bank details for APMC crop procurement</p>
+        {/* Top Centered Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center gap-2 bg-amber-400/20 text-amber-300 px-4 py-1.5 rounded-full text-xs font-bold border border-amber-400/30 mb-3 backdrop-blur-md">
+            <Sprout className="w-4 h-4 text-amber-400" />
+            <span>Official APMC Farmer Registration Portal</span>
           </div>
+          <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">Farmer Registration</h2>
+          <p className="text-sm text-emerald-200/90 mt-1">Register your profile and bank details for direct APMC crop procurement</p>
+        </div>
 
-          {/* Form Card */}
-          <div className="bg-white/95 backdrop-blur-md p-6 sm:p-8 rounded-2xl border border-emerald-400/30 shadow-2xl">
+        {/* 2-Column Layout: Form Left, Image Right (Exact Fit) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+          
+          {/* LEFT SIDE: Farmer Registration Form Card */}
+          <div className="lg:col-span-7 bg-white/95 backdrop-blur-md p-6 sm:p-8 rounded-2xl border border-emerald-400/30 shadow-2xl flex flex-col justify-between">
             {error && (
               <div className="mb-6 bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-sm flex items-center gap-3">
                 <AlertCircle className="w-5 h-5 flex-shrink-0" />
@@ -395,58 +395,59 @@ export default function FarmerRegister() {
               </Link>
             </div>
           </div>
-        </div>
 
-        {/* RIGHT SIDE: Farmer Image + Logo Showcase Card */}
-        <div className="lg:col-span-5 hidden lg:flex flex-col justify-between relative rounded-2xl overflow-hidden border border-amber-400/40 shadow-2xl bg-gray-900 min-h-[600px] group">
-          
-          {/* Background Farmer Image */}
-          <img
-            src="/farmer_register_bg.jpg"
-            alt="APMC Farmer"
-            className="absolute inset-0 w-full h-full object-cover object-center filter brightness-90 group-hover:scale-105 transition-transform duration-700"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-emerald-950 via-emerald-950/40 to-black/30" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/40" />
+          {/* RIGHT SIDE: Farmer Image + Emblem Logo Showcase Card (Exact Fit) */}
+          <div className="lg:col-span-5 hidden lg:flex flex-col justify-between relative rounded-2xl overflow-hidden border border-amber-400/50 shadow-2xl bg-gray-900 group h-full">
+            
+            {/* Background Farmer Image - Exactly Fitted with object-cover */}
+            <img
+              src="/farmer_register_bg.jpg"
+              alt="APMC Farmer"
+              className="absolute inset-0 w-full h-full object-cover object-center filter brightness-95 group-hover:scale-105 transition-transform duration-700"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-emerald-950 via-emerald-950/30 to-black/30" />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/30" />
 
-          {/* Top Logo Emblem Overlay */}
-          <div className="relative z-10 p-6 flex items-center justify-between">
-            <div className="inline-flex items-center gap-3 bg-gray-950/90 backdrop-blur-md border border-amber-400/60 p-2.5 pr-5 rounded-2xl shadow-xl">
-              <img
-                src="/farmer_logo.png"
-                alt="AgriQueue Emblem"
-                className="w-12 h-12 object-contain bg-gray-900 rounded-xl p-0.5 border border-amber-400 shadow-md"
-              />
-              <div>
-                <span className="text-xl font-black text-white tracking-tight block">AgriQueue</span>
-                <span className="text-[10px] font-bold text-amber-300 uppercase tracking-wider block">Farmer Direct Portal</span>
+            {/* Top Logo Emblem Overlay */}
+            <div className="relative z-10 p-6 flex items-center justify-between">
+              <div className="inline-flex items-center gap-3 bg-gray-950/90 backdrop-blur-md border border-amber-400/60 p-2.5 pr-5 rounded-2xl shadow-xl">
+                <img
+                  src="/farmer_logo.png"
+                  alt="AgriQueue Emblem"
+                  className="w-12 h-12 object-contain bg-gray-900 rounded-xl p-0.5 border border-amber-400 shadow-md"
+                />
+                <div>
+                  <span className="text-xl font-black text-white tracking-tight block">AgriQueue</span>
+                  <span className="text-[10px] font-bold text-amber-300 uppercase tracking-wider block">Farmer Direct Portal</span>
+                </div>
+              </div>
+
+              <span className="bg-emerald-600/90 text-white text-xs font-bold px-3.5 py-1.5 rounded-full border border-emerald-400/40 backdrop-blur-md shadow-lg">
+                🌾 APMC Direct
+              </span>
+            </div>
+
+            {/* Bottom Card Highlights */}
+            <div className="relative z-10 p-6 bg-gradient-to-t from-emerald-950 via-emerald-950/95 to-transparent pt-16">
+              <h3 className="text-xl font-black text-white mb-2 leading-snug">
+                Guaranteed APMC Queue & 24-Hour Bank Credit
+              </h3>
+              <p className="text-xs text-emerald-200/90 leading-relaxed mb-4">
+                Book slots effortlessly, avoid endless waiting lines, and receive direct payments to your bank account with complete weighment transparency in Quintals & Kgs.
+              </p>
+
+              <div className="grid grid-cols-2 gap-3 pt-3 border-t border-emerald-800/80">
+                <div className="bg-emerald-900/70 backdrop-blur-md p-3 rounded-xl border border-emerald-500/30">
+                  <span className="text-amber-300 text-xs font-extrabold block">Confidential OTP</span>
+                  <span className="text-[11px] text-emerald-200">Manual 6-digit entry</span>
+                </div>
+                <div className="bg-emerald-900/70 backdrop-blur-md p-3 rounded-xl border border-emerald-500/30">
+                  <span className="text-amber-300 text-xs font-extrabold block">Toll-Free Support</span>
+                  <span className="text-[11px] text-emerald-200">1800-425-1555</span>
+                </div>
               </div>
             </div>
 
-            <span className="bg-emerald-600/90 text-white text-xs font-bold px-3 py-1.5 rounded-full border border-emerald-400/40 backdrop-blur-md shadow-lg">
-              🌾 APMC Direct
-            </span>
-          </div>
-
-          {/* Bottom Card Highlights */}
-          <div className="relative z-10 p-6 bg-gradient-to-t from-emerald-950 via-emerald-950/95 to-transparent pt-16">
-            <h3 className="text-xl font-black text-white mb-2 leading-snug">
-              Guaranteed APMC Queue & 24-Hour Bank Credit
-            </h3>
-            <p className="text-xs text-emerald-200/90 leading-relaxed mb-4">
-              Book slots effortlessly, avoid endless waiting lines, and receive direct payments to your bank account with complete weighment transparency in Quintals & Kgs.
-            </p>
-
-            <div className="grid grid-cols-2 gap-3 pt-3 border-t border-emerald-800/80">
-              <div className="bg-emerald-900/70 backdrop-blur-md p-3 rounded-xl border border-emerald-500/30">
-                <span className="text-amber-300 text-xs font-extrabold block">Confidential OTP</span>
-                <span className="text-[11px] text-emerald-200">Manual 6-digit entry</span>
-              </div>
-              <div className="bg-emerald-900/70 backdrop-blur-md p-3 rounded-xl border border-emerald-500/30">
-                <span className="text-amber-300 text-xs font-extrabold block">Toll-Free Support</span>
-                <span className="text-[11px] text-emerald-200">1800-425-1555</span>
-              </div>
-            </div>
           </div>
 
         </div>
