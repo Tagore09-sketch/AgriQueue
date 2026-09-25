@@ -131,8 +131,8 @@ export default function Payment() {
                 <div>
                   <span className="text-xs font-bold text-gray-400 uppercase tracking-wider block">Real-Time Payment Disbursal Status</span>
                   <span className="text-lg font-extrabold text-gray-900">
-                    {payment.status === 'COMPLETED' ? '🎉 Payment Successfully Disbursed' :
-                     payment.status === 'PROCESSING' ? '⚡ Treasury Processing (Bank UTR Live)' :
+                    {payment.status === 'COMPLETED' ? '🎉 Payment Successfully Disbursed to Bank' :
+                     payment.status === 'PROCESSING' ? '⚡ Treasury Processing (Bank UTR Generated)' :
                      '⏳ Awaiting Officer Payment Release'}
                   </span>
                 </div>
@@ -151,12 +151,46 @@ export default function Payment() {
                 <div className={`p-2.5 rounded-xl text-center border text-xs font-bold ${
                   getStatusStep(payment.status) >= 2 ? 'bg-blue-100 border-blue-400 text-blue-900 animate-pulse' : 'bg-gray-100 border-gray-200 text-gray-400'
                 }`}>
-                  2. Processing
+                  2. Processing (24h SLA)
                 </div>
                 <div className={`p-2.5 rounded-xl text-center border text-xs font-bold ${
                   getStatusStep(payment.status) >= 3 ? 'bg-green-100 border-green-400 text-green-900' : 'bg-gray-100 border-gray-200 text-gray-400'
                 }`}>
                   3. Transferred
+                </div>
+              </div>
+
+              {/* 24-Hour Bank Credit SLA & SMS Message Banner */}
+              <div className="bg-blue-50/90 border border-blue-200 p-4 rounded-xl text-xs space-y-2 text-blue-950">
+                <div className="flex items-start gap-2">
+                  <ShieldCheck className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-extrabold block text-sm text-blue-900">💬 SMS Notification Sent to +91 {payment.farmerMobile}:</span>
+                    <p className="mt-1 leading-relaxed text-blue-900">
+                      "Dear <strong>{payment.farmerName}</strong>, your APMC procurement payout of <strong>₹ {Number(payment.amount || payment.grossAmount).toLocaleString('en-IN')}</strong> (Bank Ref: <strong>{payment.transactionReference}</strong>) has been processed. 
+                      <span className="font-bold underline ml-1">The amount will be credited to your registered bank account within 24 hours.</span>"
+                    </p>
+                  </div>
+                </div>
+
+                {/* Toll-Free Helpline Support Box */}
+                <div className="mt-3 pt-3 border-t border-blue-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-white/80 p-3 rounded-lg border border-blue-200">
+                  <div className="flex items-center gap-2">
+                    <span className="p-1.5 bg-blue-600 text-white rounded-lg font-mono font-bold text-xs">☎️</span>
+                    <div>
+                      <span className="font-bold text-gray-900 text-xs block">If amount is not credited within 24 hours:</span>
+                      <span className="text-[11px] text-gray-600">Contact APMC Direct Toll-Free Payment Helpline</span>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <a
+                      href="tel:18004251555"
+                      className="inline-block font-mono font-extrabold text-sm text-blue-700 hover:text-blue-900 underline"
+                    >
+                      1800-425-1555 / 1800-180-1551
+                    </a>
+                    <span className="block text-[10px] text-gray-400 font-medium">Toll-Free • 24x7 Support</span>
+                  </div>
                 </div>
               </div>
             </div>

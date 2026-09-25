@@ -1,4 +1,5 @@
 const { getDb } = require("../config/db");
+const { sendPaymentProcessingSms } = require("../services/smsService");
 
 // GET /api/payments/:bookingId
 exports.getPaymentByBookingId = async (req, res) => {
@@ -63,10 +64,20 @@ exports.updatePaymentStatus = async (req, res) => {
 
     const updatedPayment = await payments.findOne({ _id: payment._id });
 
+    // Send real-time payment SMS notification with 24-hour credit guarantee & helpline info
+    const smsRes = await sendPaymentProcessingSms(
+      updatedPayment.farmerMobile || "9876543210",
+      updatedPayment.farmerName || "Farmer",
+      updatedPayment.amount || updatedPayment.grossAmount || 0,
+      updatedPayment.transactionReference || updatedPayment.invoiceNo || "UTR-2026-APMC",
+      status
+    );
+
     return res.json({
       success: true,
-      message: `Payment status updated to ${status} successfully!`,
-      payment: updatedPayment
+      message: `Payment status updated to ${status}. ${status === 'PROCESSING' ? 'Amount will be credited within 24 hours (Helpline: 1800-425-1555).' : 'Payment transferred.'}`,
+      payment: updatedPayment,
+      smsNotification: smsRes.smsText || smsRes.message
     });
   } catch (err) {
     console.error("Update Payment Status Error:", err);

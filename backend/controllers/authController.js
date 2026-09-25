@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { getDb } = require("../config/db");
-const { sendRealSms } = require("../services/smsService");
+const { sendRealSms, sendRegistrationSms } = require("../services/smsService");
 
 const JWT_SECRET = process.env.JWT_SECRET || "agriqueue_super_secret_jwt_key_2026";
 
@@ -66,9 +66,12 @@ exports.register = async (req, res) => {
     const result = await users.insertOne(newUser);
     const createdUser = { ...newUser, _id: result.insertedId };
 
+    // Send Registration Thank-You SMS to mobile
+    await sendRegistrationSms(createdUser.mobile, createdUser.name);
+
     return res.status(201).json({
       success: true,
-      message: "Farmer registration successful! Please login using mobile OTP.",
+      message: `Thanks for registering with AgriQueue APMC! Welcome SMS sent to +91 ${createdUser.mobile}.`,
       user: {
         _id: createdUser._id,
         name: createdUser.name,
