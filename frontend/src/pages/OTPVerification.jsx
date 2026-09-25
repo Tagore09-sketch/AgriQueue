@@ -61,13 +61,22 @@ export default function OTPVerification() {
 
         {/* Dynamic OTP Notification Banner */}
         {generatedOtp && (
-          <div className="mb-6 bg-agri-50 border border-agri-200 text-agri-800 p-4 rounded-xl text-sm flex items-center justify-between shadow-sm">
+          <div className="mb-6 bg-agri-50 border border-agri-300 text-agri-900 p-4 rounded-xl text-sm flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm">
             <div className="flex items-center gap-2 font-medium">
               <ShieldCheck className="w-5 h-5 text-agri-700 flex-shrink-0" />
-              <span>OTP Sent to Mobile:</span>
+              <span>📱 SMS Sent to +91 {mobile || 'Number'}:</span>
             </div>
-            <div className="bg-agri-700 text-white font-mono font-bold text-base px-3 py-1 rounded-md">
-              {generatedOtp}
+            <div className="flex items-center gap-2">
+              <span className="bg-agri-700 text-white font-mono font-bold text-base px-3 py-1 rounded-lg tracking-wider shadow">
+                {generatedOtp}
+              </span>
+              <button
+                type="button"
+                onClick={() => setOtp(generatedOtp)}
+                className="bg-agri-100 hover:bg-agri-200 text-agri-800 text-xs font-bold px-3 py-1.5 rounded-lg border border-agri-300 transition-all active:scale-95"
+              >
+                Auto-Fill OTP
+              </button>
             </div>
           </div>
         )}

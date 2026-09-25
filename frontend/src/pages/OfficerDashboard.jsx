@@ -467,30 +467,42 @@ export default function OfficerDashboard() {
               </div>
 
               <form onSubmit={handleSubmitProcurement} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
-                    Quantity Brought (Kg) *
-                  </label>
-                  <input
-                    type="number"
-                    value={procurementForm.quantityBrought}
-                    onChange={(e) => setProcurementForm({ ...procurementForm, quantityBrought: e.target.value })}
-                    required
-                    className="block w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm font-semibold text-gray-900"
-                  />
-                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                      Quantity Brought (Kg) *
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        value={procurementForm.quantityBrought}
+                        onChange={(e) => setProcurementForm({ ...procurementForm, quantityBrought: e.target.value })}
+                        required
+                        className="block w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm font-semibold text-gray-900"
+                      />
+                      <span className="absolute right-2.5 top-2.5 text-[11px] font-bold text-agri-700 bg-agri-100 px-1.5 py-0.5 rounded">
+                        {(parseFloat(procurementForm.quantityBrought || 0) / 100).toFixed(2)} Qtl
+                      </span>
+                    </div>
+                  </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
-                    Accepted Quantity (Kg) *
-                  </label>
-                  <input
-                    type="number"
-                    value={procurementForm.acceptedQuantity}
-                    onChange={(e) => setProcurementForm({ ...procurementForm, acceptedQuantity: e.target.value })}
-                    required
-                    className="block w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm font-semibold text-gray-900"
-                  />
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                      Accepted Quantity (Kg) *
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        value={procurementForm.acceptedQuantity}
+                        onChange={(e) => setProcurementForm({ ...procurementForm, acceptedQuantity: e.target.value })}
+                        required
+                        className="block w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm font-semibold text-gray-900"
+                      />
+                      <span className="absolute right-2.5 top-2.5 text-[11px] font-bold text-agri-700 bg-agri-100 px-1.5 py-0.5 rounded">
+                        {(parseFloat(procurementForm.acceptedQuantity || 0) / 100).toFixed(2)} Qtl
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -513,14 +525,19 @@ export default function OfficerDashboard() {
                     <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
                       Price per Kg (₹) *
                     </label>
-                    <input
-                      type="number"
-                      step="0.5"
-                      value={procurementForm.pricePerKg}
-                      onChange={(e) => setProcurementForm({ ...procurementForm, pricePerKg: e.target.value })}
-                      required
-                      className="block w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm font-semibold text-gray-900"
-                    />
+                    <div className="relative">
+                      <input
+                        type="number"
+                        step="0.5"
+                        value={procurementForm.pricePerKg}
+                        onChange={(e) => setProcurementForm({ ...procurementForm, pricePerKg: e.target.value })}
+                        required
+                        className="block w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm font-semibold text-gray-900"
+                      />
+                      <span className="absolute right-2.5 top-2.5 text-[10px] font-bold text-gray-500">
+                        ₹{(parseFloat(procurementForm.pricePerKg || 0) * 100).toFixed(0)}/Qtl
+                      </span>
+                    </div>
                   </div>
                 </div>
 
@@ -537,8 +554,13 @@ export default function OfficerDashboard() {
                 </div>
 
                 <div className="bg-agri-50 border border-agri-200 p-4 rounded-xl flex items-center justify-between text-sm">
-                  <span className="font-bold text-agri-900">Gross Total Amount:</span>
-                  <span className="font-extrabold text-agri-800 text-lg">
+                  <div>
+                    <span className="font-bold text-agri-900 block">Gross Total Payout:</span>
+                    <span className="text-[11px] text-gray-500 font-medium">
+                      {(parseFloat(procurementForm.acceptedQuantity || 0) / 100).toFixed(2)} Qtl @ ₹{(parseFloat(procurementForm.pricePerKg || 0) * 100).toFixed(0)} / Qtl
+                    </span>
+                  </div>
+                  <span className="font-extrabold text-agri-800 text-xl">
                     ₹ {(parseFloat(procurementForm.acceptedQuantity || 0) * parseFloat(procurementForm.pricePerKg || 0)).toLocaleString('en-IN')}
                   </span>
                 </div>

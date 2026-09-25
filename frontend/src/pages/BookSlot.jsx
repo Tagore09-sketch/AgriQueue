@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
-import { Calendar, Clock, MapPin, Sprout, AlertCircle, CheckCircle2, Ticket } from 'lucide-react';
+import { Calendar, Clock, MapPin, Sprout, AlertCircle, CheckCircle2, Ticket, Scale, Info } from 'lucide-react';
+import ProcurementMap from '../components/ProcurementMap';
+import { formatQuantity, kgToQtl, qtlToKg } from '../utils/quantity';
 
 export default function BookSlot() {
   const navigate = useNavigate();
@@ -9,9 +11,10 @@ export default function BookSlot() {
   const todayStr = new Date().toISOString().split('T')[0];
 
   const [formData, setFormData] = useState({
-    centre: 'Main Procurement Centre',
+    centre: 'Main APMC Central Yard (Guntur)',
     crop: 'Paddy',
-    quantity: '2500',
+    quantityQtl: '25', // Default in Quintals (25 Qtl = 2500 Kg)
+    quantityKg: '2500',
     date: todayStr,
     timeSlot: '09:00–10:00'
   });
@@ -24,14 +27,38 @@ export default function BookSlot() {
     // Pre-fetch user default crop & qty
     api.get('/auth/me').then(res => {
       if (res.success && res.user) {
+        const defaultKg = res.user.expectedQuantity || 2500;
         setFormData(prev => ({
           ...prev,
           crop: res.user.cropName || 'Paddy',
-          quantity: String(res.user.expectedQuantity || '2500')
+          quantityKg: String(defaultKg),
+          quantityQtl: kgToQtl(defaultKg)
         }));
       }
     }).catch(() => {});
   }, []);
+
+  const handleQtlChange = (e) => {
+    const qtlVal = e.target.value;
+    const computedKg = qtlToKg(qtlVal);
+    setFormData(prev => ({
+      ...prev,
+      quantityQtl: qtlVal,
+      quantityKg: String(computedKg)
+    }));
+    setError('');
+  };
+
+  const handleKgChange = (e) => {
+    const kgVal = e.target.value;
+    const computedQtl = kgToQtl(kgVal);
+    setFormData(prev => ({
+      ...prev,
+      quantityKg: kgVal,
+      quantityQtl: computedQtl
+    }));
+    setError('');
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -43,15 +70,22 @@ export default function BookSlot() {
     setError('');
     setConfirmation(null);
 
-    const numQty = parseFloat(formData.quantity);
+    const numQty = parseFloat(formData.quantityKg);
     if (isNaN(numQty) || numQty <= 0) {
-      setError('Please enter a valid positive quantity in Kg.');
+      setError('Please enter a valid positive quantity in Quintals or Kg.');
       return;
     }
 
     try {
       setLoading(true);
-      const res = await api.post('/bookings', formData);
+      const payload = {
+        centre: formData.centre,
+        crop: formData.crop || 'General Produce / Paddy',
+        quantity: numQty,
+        date: formData.date,
+        timeSlot: formData.timeSlot
+      };
+      const res = await api.post('/bookings', payload);
       if (res.success && res.booking) {
         setConfirmation(res.booking);
       }
@@ -63,17 +97,23 @@ export default function BookSlot() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-[calc(100vh-4rem)] bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto space-y-8">
         
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center">
           <div className="inline-flex p-3 bg-agri-100 text-agri-700 rounded-2xl mb-3">
             <Calendar className="w-8 h-8" />
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900">Book Procurement Slot</h2>
-          <p className="text-sm text-gray-500 mt-1">Select your preferred centre, date, and arrival time slot</p>
+          <p className="text-sm text-gray-500 mt-1">Select your preferred procurement centre, date, and arrival time slot</p>
         </div>
+
+        {/* Google Maps Procurement Centres Map Component */}
+        <ProcurementMap
+          selectedCentreId={formData.centre}
+          onSelectCentre={(centreName) => setFormData(prev => ({ ...prev, centre: centreName }))}
+        />
 
         {/* Confirmation Screen if booked */}
         {confirmation ? (
@@ -89,25 +129,25 @@ export default function BookSlot() {
               <h3 className="text-2xl font-extrabold text-gray-900 mt-3">Slot Reserved Successfully!</h3>
             </div>
 
-            <div className="bg-agri-50 border border-agri-200 p-6 rounded-2xl grid grid-cols-2 gap-4 text-left">
+            <div className="bg-agri-50 border border-agri-200 p-6 rounded-2xl grid grid-cols-2 sm:grid-cols-4 gap-4 text-left">
               <div>
                 <span className="text-xs text-gray-500 font-semibold block uppercase">Booking ID</span>
-                <span className="text-lg font-extrabold text-gray-900">{confirmation.bookingId}</span>
+                <span className="text-base font-extrabold text-gray-900">{confirmation.bookingId}</span>
               </div>
 
               <div>
                 <span className="text-xs text-gray-500 font-semibold block uppercase">Token Number</span>
-                <span className="text-xl font-mono font-extrabold text-agri-700">{confirmation.tokenNumber}</span>
+                <span className="text-lg font-mono font-extrabold text-agri-700">{confirmation.tokenNumber}</span>
               </div>
 
               <div>
-                <span className="text-xs text-gray-500 font-semibold block uppercase">Queue Position</span>
-                <span className="text-lg font-bold text-gray-900">Position #{confirmation.queuePosition}</span>
+                <span className="text-xs text-gray-500 font-semibold block uppercase">Quantity</span>
+                <span className="text-sm font-bold text-gray-900">{formatQuantity(confirmation.quantity)}</span>
               </div>
 
               <div>
                 <span className="text-xs text-gray-500 font-semibold block uppercase">Est. Waiting Time</span>
-                <span className="text-lg font-bold text-gray-900">{confirmation.estimatedWaitingTime} minutes</span>
+                <span className="text-sm font-bold text-gray-900">{confirmation.estimatedWaitingTime} minutes</span>
               </div>
             </div>
 
@@ -140,28 +180,28 @@ export default function BookSlot() {
 
             <form onSubmit={handleSubmit} className="space-y-6">
               
-              {/* Procurement Centre */}
+              {/* Selected Procurement Centre Display */}
               <div>
                 <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
-                  Procurement Centre *
+                  Selected Procurement Centre *
                 </label>
-                <select
-                  name="centre"
-                  value={formData.centre}
-                  onChange={handleChange}
-                  className="block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-sm font-semibold text-gray-900 focus:bg-white focus:ring-2 focus:ring-agri-500 focus:border-agri-500 transition-all"
-                >
-                  <option value="Main Procurement Centre">Main Procurement Centre</option>
-                  <option value="Village Procurement Centre">Village Procurement Centre</option>
-                </select>
+                <div className="flex items-center gap-3 p-3.5 bg-agri-50 border border-agri-200 rounded-xl text-agri-900 font-bold text-sm">
+                  <MapPin className="w-5 h-5 text-agri-700 flex-shrink-0" />
+                  <span>{formData.centre}</span>
+                </div>
               </div>
 
-              {/* Crop & Quantity */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              {/* Crop (Optional) & Quintals/Kg Quantity */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                
+                {/* Optional Crop Selection */}
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
-                    Crop *
-                  </label>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">
+                      Crop Type
+                    </label>
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 bg-gray-100 text-gray-500 rounded">Optional</span>
+                  </div>
                   <select
                     name="crop"
                     value={formData.crop}
@@ -169,26 +209,60 @@ export default function BookSlot() {
                     className="block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-sm font-semibold text-gray-900 focus:bg-white focus:ring-2 focus:ring-agri-500 focus:border-agri-500 transition-all"
                   >
                     <option value="Paddy">Paddy</option>
+                    <option value="Wheat">Wheat</option>
                     <option value="Maize">Maize</option>
                     <option value="Cotton">Cotton</option>
-                    <option value="Wheat">Wheat</option>
+                    <option value="Pulses">Pulses</option>
+                    <option value="General Produce / Paddy">General Produce / Not Specified</option>
                   </select>
                 </div>
 
+                {/* Quantity in Quintals (Qtl) */}
                 <div>
                   <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
-                    Expected Quantity (in Kg) *
+                    Quantity (in Quintals) *
                   </label>
-                  <input
-                    type="number"
-                    name="quantity"
-                    value={formData.quantity}
-                    onChange={handleChange}
-                    placeholder="e.g. 2500"
-                    required
-                    className="block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-sm font-semibold text-gray-900 focus:bg-white focus:ring-2 focus:ring-agri-500 focus:border-agri-500 transition-all"
-                  />
+                  <div className="relative">
+                    <input
+                      type="number"
+                      step="0.5"
+                      name="quantityQtl"
+                      value={formData.quantityQtl}
+                      onChange={handleQtlChange}
+                      placeholder="e.g. 25"
+                      required
+                      className="block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-sm font-bold text-gray-900 focus:bg-white focus:ring-2 focus:ring-agri-500 focus:border-agri-500 transition-all"
+                    />
+                    <span className="absolute right-3 top-3 text-xs font-bold text-agri-700 bg-agri-100 px-2 py-0.5 rounded">Qtl</span>
+                  </div>
                 </div>
+
+                {/* Quantity in Kg (Auto Equivalent) */}
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                    Equivalent Quantity (Kg)
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      name="quantityKg"
+                      value={formData.quantityKg}
+                      onChange={handleKgChange}
+                      placeholder="e.g. 2500"
+                      className="block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-sm font-bold text-gray-900 focus:bg-white focus:ring-2 focus:ring-agri-500 focus:border-agri-500 transition-all"
+                    />
+                    <span className="absolute right-3 top-3 text-xs font-bold text-gray-600 bg-gray-200 px-2 py-0.5 rounded">Kg</span>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Quantity Helper Banner */}
+              <div className="bg-agri-50/60 border border-agri-200 rounded-xl p-3 text-xs text-agri-900 flex items-center gap-2">
+                <Scale className="w-4 h-4 text-agri-700 flex-shrink-0" />
+                <span>
+                  Selected Quantity: <strong className="font-bold text-agri-800">{formData.quantityQtl || '0'} Quintal</strong> ({parseInt(formData.quantityKg || 0).toLocaleString('en-IN')} Kg)
+                </span>
               </div>
 
               {/* Date & Time Slot */}

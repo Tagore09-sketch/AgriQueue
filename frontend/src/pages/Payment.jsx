@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { api } from '../services/api';
-import { CreditCard, CheckCircle2, Clock, AlertCircle, ArrowLeft, Receipt, ShieldCheck, Printer, Building2, Download } from 'lucide-react';
+import { CreditCard, CheckCircle2, Clock, AlertCircle, ArrowLeft, Receipt, ShieldCheck, Printer, Building2, Scale, RefreshCw } from 'lucide-react';
+import { formatQuantity } from '../utils/quantity';
 
 export default function Payment() {
   const [searchParams] = useSearchParams();
@@ -11,12 +12,18 @@ export default function Payment() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [infoMsg, setInfoMsg] = useState('');
+  const [lastUpdated, setLastUpdated] = useState(new Date());
 
   useEffect(() => {
     fetchPayment();
+    // Auto-poll live payment status every 5 seconds
+    const interval = setInterval(() => {
+      fetchPayment(true);
+    }, 5000);
+    return () => clearInterval(interval);
   }, [bookingIdQuery]);
 
-  const fetchPayment = async () => {
+  const fetchPayment = async (isBackground = false) => {
     let targetBookingId = bookingIdQuery;
 
     if (!targetBookingId) {
@@ -25,60 +32,69 @@ export default function Payment() {
         if (resBookings.success && resBookings.bookings && resBookings.bookings.length > 0) {
           targetBookingId = resBookings.bookings[0].bookingId;
         } else {
-          setLoading(false);
+          if (!isBackground) setLoading(false);
           setError('No booking found.');
           return;
         }
       } catch (err) {
-        setLoading(false);
+        if (!isBackground) setLoading(false);
         setError('Failed to load bookings.');
         return;
       }
     }
 
     try {
-      setLoading(true);
+      if (!isBackground) setLoading(true);
       const res = await api.get(`/payments/${targetBookingId}`);
       if (res.success) {
         if (res.payment) {
           setPayment(res.payment);
+          setLastUpdated(new Date());
         } else {
           setInfoMsg(res.message || 'Payment record & official invoice will be generated once procurement is completed by officer.');
         }
       }
     } catch (err) {
-      setError(err.message || 'Error fetching payment record.');
+      if (!isBackground) setError(err.message || 'Error fetching payment record.');
     } finally {
-      setLoading(false);
+      if (!isBackground) setLoading(false);
     }
   };
 
-  const getStatusBadge = (status) => {
-    if (status === 'COMPLETED') return 'bg-green-100 text-green-800 border-green-300';
-    if (status === 'PROCESSING') return 'bg-blue-100 text-blue-800 border-blue-300 animate-pulse';
-    return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+  const getStatusStep = (status) => {
+    if (status === 'COMPLETED') return 3;
+    if (status === 'PROCESSING') return 2;
+    return 1;
   };
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto space-y-6">
         
-        {/* Top Link */}
+        {/* Top Link & Actions */}
         <div className="flex justify-between items-center">
           <Link
             to="/farmer/dashboard"
-            className="inline-flex items-center gap-2 text-sm font-bold text-gray-600 hover:text-agri-700"
+            className="inline-flex items-center gap-2 text-sm font-bold text-gray-600 hover:text-agri-700 transition-all"
           >
             <ArrowLeft className="w-4 h-4" /> Back to Dashboard
           </Link>
 
           {payment && (
-            <button
-              onClick={() => window.print()}
-              className="inline-flex items-center gap-2 bg-white hover:bg-gray-50 border border-gray-300 px-3.5 py-1.5 rounded-xl text-xs font-bold text-gray-700 shadow-sm"
-            >
-              <Printer className="w-4 h-4 text-agri-700" /> Print Invoice
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => fetchPayment()}
+                className="inline-flex items-center gap-1.5 bg-white hover:bg-gray-50 border border-gray-300 px-3 py-1.5 rounded-xl text-xs font-bold text-gray-700 shadow-sm"
+              >
+                <RefreshCw className="w-3.5 h-3.5 text-agri-700" /> Refresh Live
+              </button>
+              <button
+                onClick={() => window.print()}
+                className="inline-flex items-center gap-1.5 bg-agri-700 hover:bg-agri-800 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold shadow-sm"
+              >
+                <Printer className="w-3.5 h-3.5" /> Print Invoice
+              </button>
+            </div>
           )}
         </div>
 
@@ -88,12 +104,12 @@ export default function Payment() {
             <Receipt className="w-8 h-8" />
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900">Procurement Invoice & Payment</h2>
-          <p className="text-sm text-gray-500 mt-1">Official APMC Mandi Procurement Settlement Slip & Bank Disbursal</p>
+          <p className="text-sm text-gray-500 mt-1">Official APMC Mandi Procurement Settlement Slip & Real-Time Bank Disbursal</p>
         </div>
 
         {loading ? (
-          <div className="bg-white p-12 rounded-2xl text-center font-bold text-agri-700 animate-pulse">
-            Loading Payment Invoice...
+          <div className="bg-white p-12 rounded-2xl text-center font-bold text-agri-700 animate-pulse border border-gray-200">
+            Fetching Payment Invoice & Live Disbursal Status...
           </div>
         ) : error ? (
           <div className="bg-white p-8 rounded-2xl border border-red-200 text-center space-y-3">
@@ -102,30 +118,51 @@ export default function Payment() {
           </div>
         ) : infoMsg ? (
           <div className="bg-white p-8 rounded-2xl border border-gray-200 text-center space-y-4">
-            <Clock className="w-12 h-12 text-amber-500 mx-auto" />
-            <h3 className="text-lg font-bold text-gray-900">Payment Pending Procurement Completion</h3>
+            <Clock className="w-12 h-12 text-amber-500 mx-auto animate-spin-slow" />
+            <h3 className="text-lg font-bold text-gray-900">Payment Pending Inspection Completion</h3>
             <p className="text-sm text-gray-600 max-w-md mx-auto">{infoMsg}</p>
           </div>
         ) : payment && (
           <div className="space-y-6">
             
-            {/* Disbursal Banner */}
-            <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm text-center space-y-3">
-              <span className="text-xs font-bold text-gray-400 uppercase tracking-wider block">Disbursal Status</span>
-              <div>
-                <span className={`inline-block px-4 py-1.5 rounded-full text-base font-extrabold tracking-wide border ${getStatusBadge(payment.status)}`}>
-                  STATUS: {payment.status}
+            {/* Real-Time Disbursal Progress Banner */}
+            <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-md space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-bold text-gray-400 uppercase tracking-wider block">Real-Time Payment Disbursal Status</span>
+                  <span className="text-lg font-extrabold text-gray-900">
+                    {payment.status === 'COMPLETED' ? '🎉 Payment Successfully Disbursed' :
+                     payment.status === 'PROCESSING' ? '⚡ Treasury Processing (Bank UTR Live)' :
+                     '⏳ Awaiting Officer Payment Release'}
+                  </span>
+                </div>
+                <span className="text-[11px] text-gray-400 font-mono">
+                  Live Sync: {lastUpdated.toLocaleTimeString()}
                 </span>
               </div>
-              <p className="text-xs text-gray-500 max-w-md mx-auto">
-                {payment.status === 'COMPLETED' ? 'Funds successfully transferred to your registered bank account.' :
-                 payment.status === 'PROCESSING' ? 'Payment is currently processing with the APMC treasury bank.' :
-                 'Procurement record verified. Awaiting officer payment release.'}
-              </p>
+
+              {/* Step Progress Bar */}
+              <div className="grid grid-cols-3 gap-2 pt-2">
+                <div className={`p-2.5 rounded-xl text-center border text-xs font-bold ${
+                  getStatusStep(payment.status) >= 1 ? 'bg-agri-100 border-agri-400 text-agri-900' : 'bg-gray-100 border-gray-200 text-gray-400'
+                }`}>
+                  1. Verified
+                </div>
+                <div className={`p-2.5 rounded-xl text-center border text-xs font-bold ${
+                  getStatusStep(payment.status) >= 2 ? 'bg-blue-100 border-blue-400 text-blue-900 animate-pulse' : 'bg-gray-100 border-gray-200 text-gray-400'
+                }`}>
+                  2. Processing
+                </div>
+                <div className={`p-2.5 rounded-xl text-center border text-xs font-bold ${
+                  getStatusStep(payment.status) >= 3 ? 'bg-green-100 border-green-400 text-green-900' : 'bg-gray-100 border-gray-200 text-gray-400'
+                }`}>
+                  3. Transferred
+                </div>
+              </div>
             </div>
 
             {/* Printable Official Mandi Invoice */}
-            <div className="bg-white border-2 border-gray-800 rounded-2xl p-6 sm:p-8 shadow-xl space-y-6 text-gray-900" id="official-invoice">
+            <div className="bg-white border-2 border-gray-900 rounded-2xl p-6 sm:p-8 shadow-xl space-y-6 text-gray-900" id="official-invoice">
               
               {/* Invoice Header */}
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 border-b-2 border-agri-700 gap-4">
@@ -161,7 +198,7 @@ export default function Payment() {
                   </div>
                   <div className="text-gray-700">Account Number: <strong className="font-mono">••••••••{payment.accountNumber ? String(payment.accountNumber).slice(-4) : '1234'}</strong></div>
                   <div className="text-gray-700">IFSC Code: <strong className="font-mono text-agri-800">{payment.ifscCode || 'SBIN0004123'}</strong></div>
-                  <div className="text-agri-700 font-semibold">Bank UTR Ref: <span className="font-mono font-bold">{payment.transactionReference}</span></div>
+                  <div className="text-agri-700 font-semibold">Bank Transaction Ref: <span className="font-mono font-bold text-agri-800">{payment.transactionReference}</span></div>
                 </div>
 
               </div>
@@ -172,18 +209,18 @@ export default function Payment() {
                   <thead>
                     <tr className="bg-agri-50 text-agri-900 font-bold border-b border-agri-200">
                       <th className="py-2.5 px-3">Crop / Variety</th>
-                      <th className="py-2.5 px-3 text-right">Brought Qty</th>
-                      <th className="py-2.5 px-3 text-right">Accepted Qty</th>
-                      <th className="py-2.5 px-3 text-right">Rate / Kg</th>
+                      <th className="py-2.5 px-3 text-right">Brought Quantity</th>
+                      <th className="py-2.5 px-3 text-right">Accepted Quantity</th>
+                      <th className="py-2.5 px-3 text-right">Rate / Quintal</th>
                       <th className="py-2.5 px-3 text-right">Gross Total</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr className="border-b border-gray-200 font-medium">
-                      <td className="py-3 px-3 font-bold text-gray-900">{payment.crop} ({payment.quality || 'Grade A'})</td>
-                      <td className="py-3 px-3 text-right">{payment.quantityBrought || payment.acceptedQuantity} Kg</td>
-                      <td className="py-3 px-3 text-right font-bold text-agri-800">{payment.acceptedQuantity} Kg ({(payment.acceptedQuantity/100).toFixed(2)} Qtl)</td>
-                      <td className="py-3 px-3 text-right">₹ {payment.pricePerKg}</td>
+                      <td className="py-3 px-3 font-bold text-gray-900">{payment.crop || 'Paddy'} ({payment.quality || 'Grade A'})</td>
+                      <td className="py-3 px-3 text-right">{formatQuantity(payment.quantityBrought || payment.acceptedQuantity)}</td>
+                      <td className="py-3 px-3 text-right font-bold text-agri-800">{formatQuantity(payment.acceptedQuantity)}</td>
+                      <td className="py-3 px-3 text-right font-bold text-gray-900">₹ {(payment.pricePerKg * 100).toLocaleString('en-IN')} / Qtl</td>
                       <td className="py-3 px-3 text-right font-bold text-gray-900">₹ {(payment.grossAmount || (payment.acceptedQuantity * payment.pricePerKg)).toLocaleString('en-IN')}</td>
                     </tr>
                   </tbody>
@@ -211,7 +248,7 @@ export default function Payment() {
                   </div>
                   
                   <div className="border-t-2 border-gray-900 pt-2 flex justify-between items-center text-sm font-black text-agri-900">
-                    <span>NET PAYABLE TO FARMER:</span>
+                    <span>NET PAYABLE AMOUNT:</span>
                     <span className="text-base text-agri-700">₹ {Number(payment.amount).toLocaleString('en-IN')}</span>
                   </div>
                 </div>
@@ -219,8 +256,8 @@ export default function Payment() {
 
               {/* Footer Stamp */}
               <div className="pt-6 border-t border-dashed border-gray-300 flex flex-col sm:flex-row justify-between items-center text-[11px] text-gray-500 gap-2">
-                <div>Authorized APMC Procurement Yard Officer • System Generated</div>
-                <div className="font-bold text-gray-700">Farmer Signature / Bank A/C Credit Certified</div>
+                <div>Authorized APMC Procurement Yard Officer • System Generated Slip</div>
+                <div className="font-bold text-gray-700">Farmer Signature / Bank Direct Transfer Certified</div>
               </div>
 
             </div>

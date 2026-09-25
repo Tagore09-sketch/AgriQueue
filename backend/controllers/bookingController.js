@@ -6,9 +6,11 @@ exports.createBooking = async (req, res) => {
     const { centre, crop, quantity, date, timeSlot } = req.body;
     const userId = req.user.userId;
 
-    if (!centre || !crop || !quantity || !date || !timeSlot) {
-      return res.status(400).json({ success: false, message: "All fields are required" });
+    if (!centre || !quantity || !date || !timeSlot) {
+      return res.status(400).json({ success: false, message: "Procurement centre, quantity, date, and time slot are required" });
     }
+
+    const selectedCrop = (crop && crop.trim()) ? crop.trim() : "General Produce / Paddy";
 
     const numQty = parseFloat(quantity);
     if (isNaN(numQty) || numQty <= 0) {
@@ -67,7 +69,7 @@ exports.createBooking = async (req, res) => {
       bookingId,
       userId,
       centre,
-      crop,
+      crop: selectedCrop,
       quantity: numQty,
       date,
       timeSlot,
