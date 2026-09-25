@@ -1,42 +1,42 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, Clock, ClipboardCheck, CreditCard, ArrowRight, CheckCircle, Sprout, ShieldCheck, MapPin } from 'lucide-react';
+import { Calendar, Clock, ClipboardCheck, CreditCard, ArrowRight, CheckCircle, Sprout } from 'lucide-react';
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-gray-900 flex flex-col justify-between text-gray-100">
       <div>
-        {/* Hero Section with Farmer Background Image */}
-        <section className="relative min-h-[560px] sm:min-h-[640px] flex items-center justify-center overflow-hidden border-b border-gray-800">
+        {/* Hero Section with Vibrant Farmer Background Image */}
+        <section className="relative min-h-[580px] sm:min-h-[660px] flex items-center justify-center overflow-hidden border-b border-gray-800">
           
-          {/* Background Image Layer */}
+          {/* Background Image Layer - Bright, Clear & Vibrant */}
           <div className="absolute inset-0 z-0">
             <img
               src="/farmer_bg.jpg"
               alt="AgriQueue Farmer Background"
-              className="w-full h-full object-cover object-center transform scale-105 filter brightness-[0.45] contrast-[1.1]"
+              className="w-full h-full object-cover object-center transform scale-100 opacity-90 filter brightness-95 contrast-105"
             />
-            {/* Gradient Overlays */}
-            <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/60 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-r from-gray-900/90 via-transparent to-gray-900/90" />
+            {/* Soft Gradient Overlay so image stays fully visible */}
+            <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-black/30" />
+            <div className="absolute inset-0 bg-gradient-to-r from-gray-900/60 via-transparent to-gray-900/60" />
           </div>
 
-          {/* Hero Content Container */}
+          {/* Hero Content Container with High-Contrast Glassmorphism */}
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
             
             {/* Tagline Badge */}
-            <div className="inline-flex items-center gap-2 bg-agri-500/20 backdrop-blur-md border border-agri-400/40 text-agri-300 text-xs sm:text-sm font-bold px-4 py-2 rounded-full mb-6 shadow-xl">
+            <div className="inline-flex items-center gap-2 bg-agri-950/80 backdrop-blur-md border border-agri-400/50 text-agri-300 text-xs sm:text-sm font-bold px-4 py-2 rounded-full mb-6 shadow-2xl">
               <Sprout className="w-4 h-4 text-agri-400" />
               <span>Book. Queue. Procure. Get Paid.</span>
             </div>
 
             {/* Hero Main Heading */}
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight mb-6 drop-shadow-md">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight mb-6 drop-shadow-lg">
               Avoid Long Waiting at <span className="text-transparent bg-clip-text bg-gradient-to-r from-agri-400 via-emerald-300 to-green-400">APMC Procurement Centres</span>
             </h1>
 
             {/* Description */}
-            <p className="text-base sm:text-xl text-gray-200 mb-8 max-w-3xl mx-auto font-medium leading-relaxed drop-shadow-sm">
+            <p className="text-base sm:text-xl text-white mb-8 max-w-3xl mx-auto font-bold leading-relaxed drop-shadow-md bg-black/40 backdrop-blur-md p-4 rounded-2xl border border-white/20">
               AgriQueue empowers farmers to book procurement slots in advance, track live queue positions, view digital inspection records, and track real-time bank payment disbursals.
             </p>
 
@@ -44,7 +44,7 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-2xl mx-auto">
               <Link
                 to="/farmer/register"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-agri-600 hover:bg-agri-700 text-white font-extrabold text-base px-7 py-4 rounded-xl shadow-xl shadow-agri-600/30 transition-all hover:scale-105 active:scale-95"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-agri-600 hover:bg-agri-700 text-white font-extrabold text-base px-7 py-4 rounded-xl shadow-2xl shadow-agri-600/50 transition-all hover:scale-105 active:scale-95"
               >
                 <span>Farmer Registration</span>
                 <ArrowRight className="w-5 h-5" />
@@ -52,14 +52,14 @@ export default function Home() {
 
               <Link
                 to="/farmer/login"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-bold text-base px-7 py-4 rounded-xl border border-white/30 shadow-lg transition-all"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white font-extrabold text-base px-7 py-4 rounded-xl border border-white/40 shadow-xl transition-all"
               >
                 <span>Farmer Login</span>
               </Link>
 
               <Link
                 to="/officer/login"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gray-950/80 hover:bg-gray-950 border border-gray-700 text-gray-200 font-bold text-base px-7 py-4 rounded-xl shadow-lg transition-all"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gray-950 hover:bg-black border border-gray-700 text-gray-100 font-extrabold text-base px-7 py-4 rounded-xl shadow-xl transition-all"
               >
                 <span>Officer Console</span>
               </Link>
@@ -77,7 +77,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             
             {/* Card 1 */}
-            <div className="bg-gray-800/70 backdrop-blur-md p-6 rounded-2xl border border-gray-700/80 shadow-lg hover:border-agri-500 transition-all">
+            <div className="bg-gray-800/80 backdrop-blur-md p-6 rounded-2xl border border-gray-700 shadow-xl hover:border-agri-500 transition-all">
               <div className="w-12 h-12 bg-agri-500/20 text-agri-400 rounded-xl flex items-center justify-center mb-4 border border-agri-500/30">
                 <Calendar className="w-6 h-6" />
               </div>
@@ -88,7 +88,7 @@ export default function Home() {
             </div>
 
             {/* Card 2 */}
-            <div className="bg-gray-800/70 backdrop-blur-md p-6 rounded-2xl border border-gray-700/80 shadow-lg hover:border-agri-500 transition-all">
+            <div className="bg-gray-800/80 backdrop-blur-md p-6 rounded-2xl border border-gray-700 shadow-xl hover:border-agri-500 transition-all">
               <div className="w-12 h-12 bg-agri-500/20 text-agri-400 rounded-xl flex items-center justify-center mb-4 border border-agri-500/30">
                 <Clock className="w-6 h-6" />
               </div>
@@ -99,7 +99,7 @@ export default function Home() {
             </div>
 
             {/* Card 3 */}
-            <div className="bg-gray-800/70 backdrop-blur-md p-6 rounded-2xl border border-gray-700/80 shadow-lg hover:border-agri-500 transition-all">
+            <div className="bg-gray-800/80 backdrop-blur-md p-6 rounded-2xl border border-gray-700 shadow-xl hover:border-agri-500 transition-all">
               <div className="w-12 h-12 bg-agri-500/20 text-agri-400 rounded-xl flex items-center justify-center mb-4 border border-agri-500/30">
                 <ClipboardCheck className="w-6 h-6" />
               </div>
@@ -110,7 +110,7 @@ export default function Home() {
             </div>
 
             {/* Card 4 */}
-            <div className="bg-gray-800/70 backdrop-blur-md p-6 rounded-2xl border border-gray-700/80 shadow-lg hover:border-agri-500 transition-all">
+            <div className="bg-gray-800/80 backdrop-blur-md p-6 rounded-2xl border border-gray-700 shadow-xl hover:border-agri-500 transition-all">
               <div className="w-12 h-12 bg-agri-500/20 text-agri-400 rounded-xl flex items-center justify-center mb-4 border border-agri-500/30">
                 <CreditCard className="w-6 h-6" />
               </div>
