@@ -37,7 +37,7 @@ export default function Home() {
 
             {/* 3. Description */}
             <p className="text-base sm:text-lg text-emerald-100 mb-8 max-w-3xl mx-auto font-medium leading-relaxed drop-shadow-md bg-emerald-950/80 backdrop-blur-md p-5 rounded-2xl border border-emerald-400/30">
-              AgriQueue empowers farmers to book procurement slots in advance, track live queue positions, view digital inspection records, and track real-time bank payment disbursals.
+              Farmers often face long waiting times, lack of information regarding procurement schedules, and uncertainty about procurement status at agricultural procurement centres.
             </p>
 
             {/* Action Buttons */}
