@@ -25,10 +25,12 @@ app.use("/api/queue", queueRoutes);
 app.use("/api/procurement", procurementRoutes);
 app.use("/api/payments", paymentRoutes);
 
+const fs = require("fs");
+
 const statusResponse = (req, res) => {
   res.json({
     success: true,
-    message: "🌾 AgriQueue Backend API Server is Live & Operational!",
+    message: "🌾 AgriQueue Full-Stack Server is Live & Operational!",
     status: "Healthy",
     timestamp: new Date(),
     endpoints: {
@@ -42,13 +44,24 @@ const statusResponse = (req, res) => {
   });
 };
 
-app.get("/", statusResponse);
 app.get("/api", statusResponse);
 app.get("/api/", statusResponse);
 
 app.get("/api/health", (req, res) => {
   res.json({ success: true, message: "AgriQueue Backend API Running", timestamp: new Date() });
 });
+
+// Serve Frontend Static Files & SPA Fallback Route if frontend/dist exists
+const frontendDistPath = path.join(__dirname, "../frontend/dist");
+if (fs.existsSync(frontendDistPath)) {
+  app.use(express.static(frontendDistPath));
+  app.get("*", (req, res, next) => {
+    if (req.path.startsWith("/api")) return next();
+    res.sendFile(path.join(frontendDistPath, "index.html"));
+  });
+} else {
+  app.get("/", statusResponse);
+}
 
 // Global Error Handler
 app.use((err, req, res, next) => {
