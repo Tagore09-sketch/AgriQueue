@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { getDb } = require("../config/db");
+const { sendRealSms } = require("../services/smsService");
 
 const JWT_SECRET = process.env.JWT_SECRET || "agriqueue_super_secret_jwt_key_2026";
 
@@ -130,11 +131,15 @@ exports.sendOtp = async (req, res) => {
       { $set: { otp: generatedOtp, otpGeneratedAt: new Date() } }
     );
 
+    // Dispatch Real Mobile SMS
+    const smsResult = await sendRealSms(mobile, generatedOtp);
+
     return res.json({
       success: true,
-      message: `REAL OTP generated for +91 ${mobile}`,
-      otp: generatedOtp, // Return 6-digit OTP for SMS simulation UI
-      mobile
+      message: `REAL OTP generated & sent to +91 ${mobile}`,
+      otp: generatedOtp, // Return 6-digit OTP for SMS Toast Banner & Auto-Fill
+      mobile,
+      smsStatus: smsResult.message
     });
   } catch (err) {
     console.error("Send OTP Error:", err);
